@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SapiAdvertiser.iml" filepath="$PROJECT_DIR$/SapiAdvertiser.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sapi.iml" filepath="$PROJECT_DIR$/sapi.iml" />
     </modules>
   </component>
 </project>

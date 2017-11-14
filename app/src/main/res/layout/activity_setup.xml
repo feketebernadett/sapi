@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context="com.example.sapi.advertiser.Activities.SetupActivity">
+
+    <ImageButton
+        android:id="@+id/setupImageButton"
+        android:layout_width="@dimen/cast_intro_overlay_title_margin_top"
+        android:layout_height="@dimen/cast_intro_overlay_title_margin_top"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:background="@android:drawable/screen_background_light_transparent"
+        android:scaleType="centerCrop"
+        app:srcCompat="@mipmap/ic_account_circle_black_48dp" />
+
+    <EditText
+        android:id="@+id/setupName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/setupImageButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:ems="10"
+        android:hint="@string/displayNameHint"
+        android:inputType="textPersonName" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/setupName"
+        android:padding="20dp"
+        android:visibility="invisible"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/setupButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/finishSetup" />
+
+</RelativeLayout>

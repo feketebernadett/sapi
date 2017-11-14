@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context="com.example.sapi.advertiser.Activities.AdvertismentDetailActivity">
+
+    <TextView
+        android:id="@+id/ad_detail_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:text="TextView"
+        android:textAlignment="viewStart"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/ad_detail_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/ad_detail_title"
+        android:layout_below="@+id/ad_detail_title"
+        android:layout_marginTop="25dp"
+        android:text="TextView" />
+
+    <ImageView
+        android:id="@+id/ad_detail_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        app:srcCompat="@mipmap/add_btn" />
+
+    <Button
+        android:id="@+id/ad_detail_remove"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:background="@color/colorPrimary"
+        android:text="Delete"
+        android:textColor="@android:color/white"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/ad_detail_edit_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ad_detail_remove"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="13dp"
+        android:background="@color/colorPrimary"
+        android:text="Edit"
+        android:textColor="@android:color/white"
+        android:visibility="invisible" />
+</RelativeLayout>
