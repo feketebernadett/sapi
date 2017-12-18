@@ -20,7 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import static com.example.sapi.advertiser.Utils.Const.USERS_CHILD;
 import static com.example.sapi.advertiser.Utils.Const.USER_IMG_FIELD;
-import static com.example.sapi.advertiser.Utils.Const.USER_NAME_FIELD;
+import static com.example.sapi.advertiser.Utils.Const.USER_FIRSTNAME_FIELD;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -75,7 +75,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                         DatabaseReference user = mDatabase.child(userId);
 
-                        user.child(USER_NAME_FIELD).setValue(name);
+                        user.child(USER_FIRSTNAME_FIELD).setValue(name);
                         user.child(USER_IMG_FIELD).setValue("default");
 
                         mProgressBar.setVisibility(View.INVISIBLE);

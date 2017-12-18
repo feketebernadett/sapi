@@ -7,28 +7,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.sapi.advertiser.Models.Advertisment;
 import com.example.sapi.advertiser.R;
+import com.example.sapi.advertiser.Utils.Const;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
-import java.util.List;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import static com.example.sapi.advertiser.Utils.Const.ADS_CHILD;
 import static com.example.sapi.advertiser.Utils.Const.EXTRA_AD_ID;
@@ -37,16 +39,16 @@ import static com.example.sapi.advertiser.Utils.Const.USERS_CHILD;
 
 
 public class ListActivity extends AppCompatActivity {
-
-    private RecyclerView mAdList;
-
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabaseAds;
     private DatabaseReference mDatabaseUsers;
-
+    MyFirebaseRecyclerAdapter firebaseRecyclerAdapter;
+    MyFirebaseRecyclerAdapter firebaseSearchRecyclerAdapter;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-
-
+    @BindView(R.id.search)
+    EditText mSearch;
+    @BindView(R.id.ad_list)
+    RecyclerView mAdList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,8 +68,7 @@ public class ListActivity extends AppCompatActivity {
                 }
             }
         };
-
-        mAdList = (RecyclerView) findViewById(R.id.ad_list);
+        ButterKnife.bind(this);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setReverseLayout(true);
@@ -78,12 +79,10 @@ public class ListActivity extends AppCompatActivity {
 
 
 
-        mDatabase = FirebaseDatabase.getInstance().getReference().child(ADS_CHILD);
+        mDatabaseAds = FirebaseDatabase.getInstance().getReference().child(ADS_CHILD);
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child(USERS_CHILD);
         mDatabaseUsers.keepSynced(true);
-        mDatabase.keepSynced(true);
-
-
+        mDatabaseAds.keepSynced(true);
 
     }
 
@@ -93,50 +92,56 @@ public class ListActivity extends AppCompatActivity {
 
         mAuth.addAuthStateListener(mAuthListener);
 
-        FirebaseRecyclerAdapter<Advertisment, AdvertisementViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Advertisment, AdvertisementViewHolder>(
+        firebaseRecyclerAdapter = new MyFirebaseRecyclerAdapter(
                         Advertisment.class,
                         R.layout.ad_row,
                         AdvertisementViewHolder.class,
-                        mDatabase) {
-            @Override
-            protected void populateViewHolder(AdvertisementViewHolder viewHolder, Advertisment model, int position) {
-                final String ad_key = getRef(position).getKey();
-                final String ad_uid = model.getUid();
-
-                viewHolder.setTitle(model.getTitle());
-                viewHolder.setDescription(model.getDescription());
-                viewHolder.setImage(getApplicationContext(), model.getImage());
-                viewHolder.setUserImage(getApplicationContext(), model.getUserImage(), model.getUid());
-
-                viewHolder.mView.setOnClickListener(new View.OnClickListener(){
-
-                    @Override
-                    public void onClick(View view) {
-                        Intent adDetailIntent = new Intent(ListActivity.this, AdvertismentDetailActivity.class);
-                        adDetailIntent.putExtra(EXTRA_AD_ID, ad_key);
-                        startActivity(adDetailIntent);
-                    }
-                });
-
-                viewHolder.mUserImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent userProfileIntent = new Intent(ListActivity.this, ProfileActivity.class);
-                        userProfileIntent.putExtra(EXTRA_AD_UID, ad_uid);
-                        startActivity(userProfileIntent);
-                    }
-                });
-            }
-        };
-
+                        mDatabaseAds);
+        firebaseSearchRecyclerAdapter = new MyFirebaseRecyclerAdapter(
+                Advertisment.class,
+                R.layout.ad_row,
+                AdvertisementViewHolder.class,
+                mDatabaseAds);
         mAdList.setAdapter(firebaseRecyclerAdapter);
+
+        mSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String mInput = mSearch.getText().toString().toLowerCase();
+
+
+                if (mInput.equals("")){
+                    mAdList.setAdapter(firebaseRecyclerAdapter);
+                    return;
+                }
+                else {
+
+                    firebaseSearchRecyclerAdapter = new MyFirebaseRecyclerAdapter(Advertisment.class,
+                            R.layout.ad_row,
+                            AdvertisementViewHolder.class,
+                            mDatabaseAds.orderByChild(Const.AD_TITLE_FIELD)
+                            .startAt(mInput)
+                            .endAt(mInput + "\uf8ff"));
+
+                    mAdList.setAdapter(firebaseSearchRecyclerAdapter);
+                }
+            }
+        });
 
 
     }
 
     public static class AdvertisementViewHolder extends RecyclerView.ViewHolder{
-        View mView;
-        ImageView mUserImage;
+        public View mView;
+        public ImageView mUserImage;
 
         public AdvertisementViewHolder(View itemView) {
             super(itemView);
@@ -157,7 +162,12 @@ public class ListActivity extends AppCompatActivity {
 
         public void setDescription(String description){
             TextView ad_description= (TextView) mView.findViewById(R.id.ad_description);
-            ad_description.setText(description);
+            if(description.length()>30) {
+                ad_description.setText(description.replace("\n"," ").substring(0, 30) + "...");
+            }
+            else {
+                ad_description.setText(description.replace("\n"," "));
+            }
         }
 
         public void setImage(Context ctx, String image){
@@ -210,4 +220,47 @@ public class ListActivity extends AppCompatActivity {
             });
         }
     }
+
+
+    public class MyFirebaseRecyclerAdapter  extends  FirebaseRecyclerAdapter<com.example.sapi.advertiser.Models.Advertisment, ListActivity.AdvertisementViewHolder>{
+
+
+        public MyFirebaseRecyclerAdapter(Class<Advertisment> modelClass, int modelLayout, Class<ListActivity.AdvertisementViewHolder> viewHolderClass, Query ref) {
+            super(modelClass, modelLayout, viewHolderClass, ref);
+        }
+
+        @Override
+        protected void populateViewHolder(ListActivity.AdvertisementViewHolder viewHolder, Advertisment model, int position) {
+            final String ad_key = getRef(position).getKey();
+            final String ad_uid = model.getUid();
+
+            viewHolder.setTitle(model.getTitle());
+            viewHolder.setDescription(model.getDescription());
+            viewHolder.setImage(getApplicationContext(), model.getImage());
+            viewHolder.setUserImage(getApplicationContext(), model.getUserImage(), model.getUid());
+
+            viewHolder.mView.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View view) {
+                    Intent adDetailIntent = new Intent(ListActivity.this, AdvertismentDetailActivity.class);
+                    adDetailIntent.putExtra(EXTRA_AD_ID, ad_key);
+                    startActivity(adDetailIntent);
+                }
+            });
+
+            viewHolder.mUserImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent userProfileIntent = new Intent(ListActivity.this, ProfileActivity.class);
+                    userProfileIntent.putExtra(EXTRA_AD_UID, ad_uid);
+                    startActivity(userProfileIntent);
+                }
+            });
+        }
+    };
+
+
+
+
 }

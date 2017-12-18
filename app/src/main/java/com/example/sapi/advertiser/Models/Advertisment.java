@@ -12,7 +12,9 @@ public class Advertisment {
     private String userImage;
     private String uid;
 
-
+    public class Image{
+        public String image;
+    }
 
     public Advertisment(){
 

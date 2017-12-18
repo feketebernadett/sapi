@@ -12,10 +12,10 @@
         <ImageView
             android:id="@+id/ad_image"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:layout_alignParentTop="true"
             android:adjustViewBounds="true"
-            android:background="@mipmap/add_btn"
+            android:background="@drawable/img_not_available"
             android:scaleType="centerCrop" />
 
         <ImageView

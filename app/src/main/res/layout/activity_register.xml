@@ -14,7 +14,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="21dp"
         android:ems="10"
-        android:hint="@string/nameHint"
+
         android:inputType="textPersonName" />
 
     <EditText

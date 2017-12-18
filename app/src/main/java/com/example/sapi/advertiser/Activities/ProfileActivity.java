@@ -17,14 +17,17 @@ import com.google.firebase.database.ValueEventListener;
 import static com.example.sapi.advertiser.Utils.Const.AD_UID_FIELD;
 import static com.example.sapi.advertiser.Utils.Const.USERS_CHILD;
 import static com.example.sapi.advertiser.Utils.Const.USER_IMG_FIELD;
-import static com.example.sapi.advertiser.Utils.Const.USER_NAME_FIELD;
+import static com.example.sapi.advertiser.Utils.Const.USER_FIRSTNAME_FIELD;
 
 public class ProfileActivity extends AppCompatActivity {
     private DatabaseReference mDatabaseUsers;
     private FirebaseAuth mAuth;
     private String mUid;
-    private TextView mUserName;
+
+    private TextView mUserFirstName;
+    private TextView mUserLastName;
     private ImageView mUserImage;
+    private TextView mUserPhoneNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,17 +41,17 @@ public class ProfileActivity extends AppCompatActivity {
         mUid = getIntent().getExtras().getString(AD_UID_FIELD);
 
 
-        mUserName = (TextView) findViewById(R.id.user_profile_name);
+        mUserFirstName = (TextView) findViewById(R.id.user_profile_firstname);
         mUserImage = (ImageView) findViewById(R.id.user_profile_image);
 
 
         mDatabaseUsers.child(mUid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String user_name = (String) dataSnapshot.child(USER_NAME_FIELD).getValue();
+                String user_name = (String) dataSnapshot.child(USER_FIRSTNAME_FIELD).getValue();
                 String user_image = (String) dataSnapshot.child(USER_IMG_FIELD).getValue();
 
-                mUserName.setText(user_name);
+                mUserFirstName.setText(user_name);
                 Glide.with(ProfileActivity.this).load(user_image).into(mUserImage);
             }
 

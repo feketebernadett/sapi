@@ -7,6 +7,7 @@ package com.example.sapi.advertiser.Utils;
 public class Const {
     public static final String ADS_CHILD = "Ads";
     public static final String USERS_CHILD = "Users";
+    public static final String AD_IMAGES_CHILD="Ad_Images";
 
     public static final String AD_UID_FIELD = "Uid";
     public static final String AD_TITLE_FIELD = "title";
@@ -16,7 +17,9 @@ public class Const {
     public static final String AD_USERIMG_FIELD = "userImage";
 
     public static final String USER_IMG_FIELD = "image";
-    public static final String USER_NAME_FIELD = "name";
+    public static final String USER_FIRSTNAME_FIELD = "first_name";
+    public static final String USER_LASTNAME_FIELD = "first_name";
+    public static final String USER_PHONENUMBER_FIELD = "phonenumber";
 
     public static final String EXTRA_AD_ID = "ad_id";
     public static final String EXTRA_AD_UID = "ad_uid";
