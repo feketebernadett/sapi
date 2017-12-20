@@ -1,16 +1,22 @@
 package com.example.sapi.advertiser.Models;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Intern on 11/7/2017.
  */
 
 public class Advertisment {
-    private  String title;
-    private String description;
-    private String image;
-    private String location;
-    private String userImage;
-    private String uid;
+    public  String title;
+    public String description;
+    public String image;
+    public String location;
+    public double locationLat;
+    public double locationLng;
+    public String userImage;
+    public String uid;
+    public Map<String, String> adImages = new HashMap<>();
 
     public class Image{
         public String image;
@@ -27,54 +33,5 @@ public class Advertisment {
         this.userImage = userImage;
         this.location = location;
         this.uid = uid;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public String getUserImage() {
-        return userImage;
-    }
-
-    public void setUserImage(String userImage) {
-        this.userImage = userImage;
-    }
-
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 }

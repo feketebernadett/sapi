@@ -104,12 +104,12 @@ public class MyAdvertismentsActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(AdvertisementViewHolder viewHolder, Advertisment model, int position) {
                 final String ad_key = getRef(position).getKey();
-                final String ad_uid = model.getUid();
+                final String ad_uid = model.uid;
 
-                viewHolder.setTitle(model.getTitle());
-                viewHolder.setDescription(model.getDescription());
-                viewHolder.setImage(getApplicationContext(), model.getImage());
-                viewHolder.setUserImage(getApplicationContext(), model.getUserImage(), model.getUid());
+                viewHolder.setTitle(model.title);
+                viewHolder.setDescription(model.description);
+                viewHolder.setImage(getApplicationContext(), model.image);
+                viewHolder.setUserImage(getApplicationContext(), model.userImage, model.uid);
 
                 viewHolder.mView.setOnClickListener(new View.OnClickListener(){
 

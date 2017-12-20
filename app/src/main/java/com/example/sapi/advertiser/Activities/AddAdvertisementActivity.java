@@ -68,6 +68,8 @@ import static com.example.sapi.advertiser.Utils.Const.AD_DESC_FIELD;
 import static com.example.sapi.advertiser.Utils.Const.AD_IMAGES_CHILD;
 import static com.example.sapi.advertiser.Utils.Const.AD_IMG_FIELD;
 import static com.example.sapi.advertiser.Utils.Const.AD_LOCATION_FIELD;
+import static com.example.sapi.advertiser.Utils.Const.AD_LOCATION_LAT_FIELD;
+import static com.example.sapi.advertiser.Utils.Const.AD_LOCATION_LNG_FIELD;
 import static com.example.sapi.advertiser.Utils.Const.AD_TITLE_FIELD;
 import static com.example.sapi.advertiser.Utils.Const.AD_UID_FIELD;
 import static com.example.sapi.advertiser.Utils.Const.AD_USERIMG_FIELD;
@@ -99,6 +101,7 @@ public class AddAdvertisementActivity extends AppCompatActivity {
     HorizontalScrollView horizontal_scroll;
 
     private ArrayList<Uri> mImageUriList = new ArrayList<Uri>();;
+    private Place mPlace;
 
     private StorageReference mStorage;
     private DatabaseReference mDatabaseAds;
@@ -205,9 +208,9 @@ public class AddAdvertisementActivity extends AppCompatActivity {
         if (requestCode == RC_PLACE_PICKER
                 && resultCode == Activity.RESULT_OK) {
 
-            final Place place = PlacePicker.getPlace(this, data);
+            mPlace = PlacePicker.getPlace(this, data);
 
-            mLocationButton.setText(place.getAddress());
+            mLocationButton.setText(mPlace.getAddress());
         }
     }
 
@@ -224,6 +227,8 @@ public class AddAdvertisementActivity extends AppCompatActivity {
             newAd.child(AD_TITLE_FIELD).setValue(title);
             newAd.child(AD_DESC_FIELD).setValue(description);
             newAd.child(AD_LOCATION_FIELD).setValue(location);
+            newAd.child(AD_LOCATION_LAT_FIELD).setValue(mPlace.getLatLng().latitude);
+            newAd.child(AD_LOCATION_LNG_FIELD).setValue(mPlace.getLatLng().longitude);
             newAd.child(AD_UID_FIELD).setValue(mCurrentUser.getUid());
 
             mDatabaseUsers.addValueEventListener(new ValueEventListener() {
@@ -246,13 +251,12 @@ public class AddAdvertisementActivity extends AppCompatActivity {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 final Uri downloadUrl = taskSnapshot.getDownloadUrl();
                                 DatabaseReference newAdImage = newAdImages.push();
-                                newAdImage.child(AD_IMG_FIELD).setValue(downloadUrl.toString());
+                                newAdImage.setValue(downloadUrl.toString());
                                 newAd.child(AD_IMG_FIELD).setValue(downloadUrl.toString());
                             }
                         });
             }
-
-            startActivity(new Intent(AddAdvertisementActivity.this, ListActivity.class));
+            startActivity(new Intent(AddAdvertisementActivity.this, ListActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 
 
         }

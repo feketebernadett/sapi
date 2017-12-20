@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -45,10 +46,9 @@ public class ListActivity extends AppCompatActivity {
     MyFirebaseRecyclerAdapter firebaseSearchRecyclerAdapter;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    @BindView(R.id.search)
-    EditText mSearch;
     @BindView(R.id.ad_list)
     RecyclerView mAdList;
+    SearchView mSearchView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,40 +103,6 @@ public class ListActivity extends AppCompatActivity {
                 AdvertisementViewHolder.class,
                 mDatabaseAds);
         mAdList.setAdapter(firebaseRecyclerAdapter);
-
-        mSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String mInput = mSearch.getText().toString().toLowerCase();
-
-
-                if (mInput.equals("")){
-                    mAdList.setAdapter(firebaseRecyclerAdapter);
-                    return;
-                }
-                else {
-
-                    firebaseSearchRecyclerAdapter = new MyFirebaseRecyclerAdapter(Advertisment.class,
-                            R.layout.ad_row,
-                            AdvertisementViewHolder.class,
-                            mDatabaseAds.orderByChild(Const.AD_TITLE_FIELD)
-                            .startAt(mInput)
-                            .endAt(mInput + "\uf8ff"));
-
-                    mAdList.setAdapter(firebaseSearchRecyclerAdapter);
-                }
-            }
-        });
-
-
     }
 
     public static class AdvertisementViewHolder extends RecyclerView.ViewHolder{
@@ -180,6 +146,36 @@ public class ListActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        mSearchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                String mInput = newText;
+
+
+                if (mInput.equals("")){
+                    mAdList.setAdapter(firebaseRecyclerAdapter);
+                    return false;
+                }
+                else {
+
+                    firebaseSearchRecyclerAdapter = new MyFirebaseRecyclerAdapter(Advertisment.class,
+                            R.layout.ad_row,
+                            AdvertisementViewHolder.class,
+                            mDatabaseAds.orderByChild(Const.AD_TITLE_FIELD)
+                                    .startAt(mInput)
+                                    .endAt(mInput + "\uf8ff"));
+
+                    mAdList.setAdapter(firebaseSearchRecyclerAdapter);
+                }
+                return false;
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -232,12 +228,12 @@ public class ListActivity extends AppCompatActivity {
         @Override
         protected void populateViewHolder(ListActivity.AdvertisementViewHolder viewHolder, Advertisment model, int position) {
             final String ad_key = getRef(position).getKey();
-            final String ad_uid = model.getUid();
+            final String ad_uid = model.uid;
 
-            viewHolder.setTitle(model.getTitle());
-            viewHolder.setDescription(model.getDescription());
-            viewHolder.setImage(getApplicationContext(), model.getImage());
-            viewHolder.setUserImage(getApplicationContext(), model.getUserImage(), model.getUid());
+            viewHolder.setTitle(model.title);
+            viewHolder.setDescription(model.description);
+            viewHolder.setImage(getApplicationContext(), model.image);
+            viewHolder.setUserImage(getApplicationContext(), model.userImage, model.uid);
 
             viewHolder.mView.setOnClickListener(new View.OnClickListener(){
 
@@ -245,6 +241,7 @@ public class ListActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     Intent adDetailIntent = new Intent(ListActivity.this, AdvertismentDetailActivity.class);
                     adDetailIntent.putExtra(EXTRA_AD_ID, ad_key);
+                    adDetailIntent.putExtra(EXTRA_AD_UID, ad_uid);
                     startActivity(adDetailIntent);
                 }
             });
