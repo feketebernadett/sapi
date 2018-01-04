@@ -115,6 +115,8 @@ public class AddAdvertisementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_advertisement);
         ButterKnife.bind(this);
+        setTitle("Add New Advertisment");
+
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
 

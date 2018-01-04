@@ -21,7 +21,7 @@ public class Const {
 
     public static final String USER_IMG_FIELD = "image";
     public static final String USER_FIRSTNAME_FIELD = "firstName";
-    public static final String USER_LASTNAME_FIELD = "firstName";
+    public static final String USER_LASTNAME_FIELD = "lastName";
     public static final String USER_PHONENUMBER_FIELD = "phonenumber";
 
     public static final String EXTRA_AD_ID = "ad_id";

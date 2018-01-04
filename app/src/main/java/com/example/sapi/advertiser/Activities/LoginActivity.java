@@ -44,6 +44,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import static com.example.sapi.advertiser.Utils.Const.USERS_CHILD;
 
+/**
+ * Login Activity
+ * Ebben az Activity-ben lehet bejelentkezni
+ * Email címmel és jelszóval, facebook-al, vagy google-el
+ * Aki még nem regisztrált, lehetősége van átlépni a regisztrációs oldalra.
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private EditText mEmail;
@@ -65,8 +71,6 @@ public class LoginActivity extends AppCompatActivity {
     private LoginButton mFacebookLoginButton;
 
     private static final String TAG = "Login Activity";
-
-
 
 
     @Override
@@ -99,7 +103,9 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // Initialize Google Login button
+        /**
+         * Google Login gombjának inicializálása
+         */
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -120,8 +126,9 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
-        // Initialize Facebook Login button
+        /**
+         * Facebook Login gombjának inicializálása
+         */
         mCallbackManager = CallbackManager.Factory.create();
         mFacebookLoginButton = (LoginButton) findViewById(R.id.loginFacebookButton);
         mFacebookLoginButton.setReadPermissions("email", "public_profile");
@@ -144,6 +151,9 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Google bejelentkezés
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -151,21 +161,25 @@ public class LoginActivity extends AppCompatActivity {
         // Pass the activity result back to the Facebook SDK
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode==RC_SIGN_IN){
+        if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
 
             mProgress.setVisibility(View.VISIBLE);
 
-            if(result.isSuccess()){
+            if (result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
-            }
-            else{
+            } else {
                 mProgress.setVisibility(View.INVISIBLE);
             }
         }
     }
 
+    /**
+     * Mikor a felhasználó sikeresen bejelentkezik, kap egy ID token-t a GoogleSignInAccount
+     * objektumból, kicseréli "Firebase credential" - hitelesítő adatokra,
+     * amely segítségével bejelentkezik
+     */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
@@ -190,6 +204,10 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Miután a felhasználó sikeresen bejelentkezik, a Login gomb onSuccess callback metódusával
+     * kap egy TOKEN-t, amivel a Firebase hitelesítő adatokat megkapja, és be tud vele jelentkezni
+     */
     private void handleFacebookAccessToken(AccessToken token) {
         Log.d(TAG, "handleFacebookAccessToken:" + token);
 
@@ -212,27 +230,32 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    private void signIn(){
-        Intent signInInten = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInInten, RC_SIGN_IN);
+    /**
+     * Google bejelentkezés
+     */
+    private void signIn() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    /**
+     * A felhasználó email-el és jelszóval történő bejelentkezése
+     */
     private void checkLogin() {
         String email = mEmail.getText().toString().trim();
         String password = mPassword.getText().toString().trim();
 
-        if(!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)){
+        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
 
             mProgress.setVisibility(View.VISIBLE);
 
             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    if(task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         mProgress.setVisibility(View.INVISIBLE);
                         checkUserExists();
-                    }
-                    else{
+                    } else {
                         mProgress.setVisibility(View.INVISIBLE);
                         Toast.makeText(LoginActivity.this, "Error login", Toast.LENGTH_LONG).show();
                     }
@@ -242,9 +265,15 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * A checkUserExists megnézi, hogy létezik-e a felhasználó.
+     * Ha létezik, de még nincs kimentve az ID-a az adatbázisba - ami azt jelenti, hogy a neve,
+     * képe, telefonszáma még nincs elmentve - átirányítjuk a Setup Activity-be.
+     * Ha létezik, és már ki vannak mentve az adatai, továbbküldi a List Activity-re
+     */
     private void checkUserExists() {
-    //TODO: rewrite the check to initialize user with provider information
-        if(mAuth.getCurrentUser()!=null) {
+        //TODO: rewrite the check to initialize user with provider information
+        if (mAuth.getCurrentUser() != null) {
             final String userId = mAuth.getCurrentUser().getUid();
 
             mDatabaseUsers.addValueEventListener(new ValueEventListener() {

@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <uses-library android:name="com.google.android.maps" />
 
     <application
@@ -52,7 +53,8 @@
         <activity android:name=".Activities.LoginActivity" />
         <activity android:name=".Activities.SetupActivity" />
         <activity android:name=".Activities.ProfileActivity" />
-        <activity android:name=".Activities.MyAdvertismentsActivity"></activity>
+        <activity android:name=".Activities.MyAdvertismentsActivity" />
+        <activity android:name=".Activities.MyProfileActivity"></activity>
     </application>
 
 </manifest>

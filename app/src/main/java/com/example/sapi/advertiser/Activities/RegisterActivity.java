@@ -20,11 +20,14 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import static com.example.sapi.advertiser.Utils.Const.USERS_CHILD;
 import static com.example.sapi.advertiser.Utils.Const.USER_IMG_FIELD;
-import static com.example.sapi.advertiser.Utils.Const.USER_FIRSTNAME_FIELD;
 
+/**
+ * RegisterActivity
+ * Ez az Activity kezeli a regisztrációt.
+ * Email és jelszó segítségével regisztrál egy új felhasználót.
+ */
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText mNameField;
     private EditText mEmailField;
     private EditText mPasswordField;
 
@@ -45,12 +48,11 @@ public class RegisterActivity extends AppCompatActivity {
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        mNameField = (EditText) findViewById(R.id.nameField);
         mEmailField = (EditText) findViewById(R.id.emailField);
         mPasswordField = (EditText) findViewById(R.id.passwordField);
-        mRegisterButton  = (Button) findViewById(R.id.registerButton);
+        mRegisterButton = (Button) findViewById(R.id.registerButton);
 
-        mRegisterButton.setOnClickListener(new View.OnClickListener(){
+        mRegisterButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
@@ -61,25 +63,33 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void startRegister() {
-        final String name = mNameField.getText().toString().trim();
+        /**
+         * Az email változóba beletesszük a beolvasott email címet
+         * és a passwordba a jelszót
+         */
         String email = mEmailField.getText().toString().trim();
         String password = mPasswordField.getText().toString().trim();
-
-        if(!TextUtils.isEmpty(name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) ){
+        /**
+         * Ha egyik mező sem üres, regisztráljuk a felhasználót
+         */
+        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
             mProgressBar.setVisibility(View.VISIBLE);
             mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    if(task.isSuccessful()){
+                    if (task.isSuccessful()) {
+
                         String userId = mAuth.getCurrentUser().getUid();
 
                         DatabaseReference user = mDatabase.child(userId);
 
-                        user.child(USER_FIRSTNAME_FIELD).setValue(name);
                         user.child(USER_IMG_FIELD).setValue("default");
 
                         mProgressBar.setVisibility(View.INVISIBLE);
-
+                        /**
+                         * Beállítjuk, hogy ha BACK-et nyomunk ne hozzon vissza a regisztrációra
+                         * és átirányítjuk a ListActivity-re
+                         */
                         Intent listIntent = new Intent(RegisterActivity.this, ListActivity.class);
                         listIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(listIntent);

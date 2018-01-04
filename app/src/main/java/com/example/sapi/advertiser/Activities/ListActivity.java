@@ -187,6 +187,9 @@ public class ListActivity extends AppCompatActivity {
         if(item.getItemId()==R.id.action_logout){
             logout();
         }
+        if(item.getItemId()==R.id.action_settings){
+            startActivity(new Intent(ListActivity.this, MyProfileActivity.class));
+        }
         return super.onOptionsItemSelected(item);
     }
 

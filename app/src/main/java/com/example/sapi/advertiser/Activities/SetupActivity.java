@@ -53,15 +53,28 @@ import static com.example.sapi.advertiser.Utils.Const.USER_FIRSTNAME_FIELD;
 import static com.example.sapi.advertiser.Utils.Const.USER_LASTNAME_FIELD;
 import static com.example.sapi.advertiser.Utils.Const.USER_PHONENUMBER_FIELD;
 
+/**
+ * Setup Activity
+ * Itt bekérjük a felhasználó adatait:
+ * Vezetéknév, keresztnév, telefonszám, kép
+ * Ezeket mind kötelező megadja
+ */
 public class SetupActivity extends AppCompatActivity {
 
-    @BindView(R.id.setupImageViewBig) ImageView mUserImageView;
-    @BindView(R.id.setupFirstName) EditText mFirstName;
-    @BindView(R.id.setupLastName) EditText mLastName;
-    @BindView(R.id.setupPhoneNumber) PhoneEditText mPhoneNumber;
-    @BindView(R.id.setupImageLayout) RelativeLayout mBlurredImage;
-    @BindView(R.id.setupFinishButton) TextView mSubmitButton;
-    @BindView(R.id.progressBar) ProgressBar mProgress;
+    @BindView(R.id.setupImageViewBig)
+    ImageView mUserImageView;
+    @BindView(R.id.setupFirstName)
+    EditText mFirstName;
+    @BindView(R.id.setupLastName)
+    EditText mLastName;
+    @BindView(R.id.setupPhoneNumber)
+    PhoneEditText mPhoneNumber;
+    @BindView(R.id.setupImageLayout)
+    RelativeLayout mBlurredImage;
+    @BindView(R.id.setupFinishButton)
+    TextView mSubmitButton;
+    @BindView(R.id.progressBar)
+    ProgressBar mProgress;
 
     private Uri mImageUri = null;
 
@@ -71,20 +84,21 @@ public class SetupActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private StorageReference mStorageImage;
 
+    /**
+     * beolvassuk az adatokat
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
 
-
-
         ButterKnife.bind(this);
 
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child(USERS_CHILD);
         mAuth = FirebaseAuth.getInstance();
         mStorageImage = FirebaseStorage.getInstance().getReference().child(STORAGE_USR_IMAGES);
-        if(mAuth.getCurrentUser()==null){
+        if (mAuth.getCurrentUser() == null) {
             Intent loginIntent = new Intent(SetupActivity.this, LoginActivity.class);
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(loginIntent);
@@ -98,6 +112,9 @@ public class SetupActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * elmentjük az adatokat adatbázisba
+     */
     private void startSetupAccount() {
         if (ValidateFields()) {
             final String firstname = mFirstName.getText().toString().trim();
@@ -127,7 +144,6 @@ public class SetupActivity extends AppCompatActivity {
             });
         }
     }
-
 
 
     @Override
@@ -183,29 +199,28 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     private boolean ValidateFields() {
-        if(TextUtils.isEmpty( mFirstName.getText().toString().trim())){
-            mFirstName.setError( "First name is required!" );
+        if (TextUtils.isEmpty(mFirstName.getText().toString().trim())) {
+            mFirstName.setError("First name is required!");
             mFirstName.requestFocus();
             return false;
         }
-        if(TextUtils.isEmpty( mLastName.getText().toString().trim())){
-            mLastName.setError( "Last name is required!" );
+        if (TextUtils.isEmpty(mLastName.getText().toString().trim())) {
+            mLastName.setError("Last name is required!");
             mLastName.requestFocus();
             return false;
         }
-        if(!mPhoneNumber.isValid()){
-            mPhoneNumber.setError( "Phone number is required!" );
+        if (!mPhoneNumber.isValid()) {
+            mPhoneNumber.setError("Phone number is required!");
             mPhoneNumber.requestFocus();
             return false;
         }
-        if(mImageUri==null){
+        if (mImageUri == null) {
             Toast.makeText(getApplicationContext(), "Profile image is required!", Toast.LENGTH_SHORT).show();
             mUserImageView.requestFocus();
             return false;
         }
         return true;
     }
-
 
 
 }
