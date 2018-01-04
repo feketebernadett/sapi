@@ -1,6 +1,11 @@
 package com.example.sapi.advertiser.Models;
 
+import com.google.firebase.database.Exclude;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,22 +21,25 @@ public class Advertisment {
     public double locationLng;
     public String userImage;
     public String uid;
-    public Map<String, String> adImages = new HashMap<>();
+    public List<String> adImages =  Collections.synchronizedList(new ArrayList());
 
-    public class Image{
-        public String image;
-    }
 
     public Advertisment(){
 
     }
 
-    public Advertisment(String title, String description, String image, String userImage, String location, String uid) {
-        this.title = title;
-        this.description = description;
-        this.image = image;
-        this.userImage = userImage;
-        this.location = location;
-        this.uid = uid;
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("title", title);
+        result.put("description", description);
+        result.put("image", image);
+        result.put("location", location);
+        result.put("locationLat", locationLat);
+        result.put("locationLng", locationLat);
+        result.put("userImage", userImage);
+        result.put("uid", uid);
+        result.put("adImages", adImages);
+        return result;
     }
 }

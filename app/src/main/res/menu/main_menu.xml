@@ -13,11 +13,17 @@
     <item android:id="@+id/action_add"
         android:icon="@mipmap/ic_add_white_24dp"
         android:title="@string/addAdvertisment"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        android:visible="false"/>
     <item android:id="@+id/action_settings"
         android:title="@string/settings"
-        app:showAsAction="never"/>
+        app:showAsAction="never"
+        android:visible="false"/>
     <item android:id="@+id/action_logout"
         android:title="@string/logOut"
+        app:showAsAction="never"
+        android:visible="false"/>
+    <item android:id="@+id/action_login"
+        android:title="Log In"
         app:showAsAction="never"/>
 </menu>

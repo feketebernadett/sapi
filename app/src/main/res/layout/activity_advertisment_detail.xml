@@ -101,28 +101,6 @@
         android:layout_alignParentBottom="true"
         android:layout_toEndOf="@+id/ad_detail_user_image" />
 </RelativeLayout>
-    <Button
-        android:id="@+id/ad_detail_edit_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/user"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="13dp"
-        android:background="@color/colorPrimary"
-        android:text="Edit"
-        android:textColor="@android:color/white"
-        android:visibility="invisible" />
-    <Button
-        android:id="@+id/ad_detail_remove"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/ad_detail_edit_button"
-        android:layout_alignParentBottom="true"
-        android:background="@color/colorPrimary"
-        android:text="Delete"
-        android:layout_marginBottom="13dp"
-        android:textColor="@android:color/white"
-        android:visibility="invisible" />
 
 
 </RelativeLayout>

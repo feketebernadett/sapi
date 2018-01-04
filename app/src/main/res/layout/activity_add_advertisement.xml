@@ -28,7 +28,7 @@
         android:visibility="gone">
 
         <LinearLayout
-            android:id="@+id/imagegallery"
+            android:id="@+id/linlayout_gallery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -40,7 +40,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/AdTitle"
+        android:id="@+id/edit_title"
         android:background="@drawable/input_outline"
         android:layout_below="@+id/images"
         android:layout_centerHorizontal="true"
@@ -58,9 +58,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:id="@+id/AdDescription"
+        android:id="@+id/edit_description"
         android:background="@drawable/input_outline"
-        android:layout_below="@+id/AdTitle"
+        android:layout_below="@+id/edit_title"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
@@ -76,24 +76,13 @@
         android:focusable="true"/>
 
     <Button
-        android:id="@+id/AdLocation"
+        android:id="@+id/button_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/AdDescription"
+        android:layout_below="@+id/edit_description"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="27dp"
         android:text="@string/location" />
-
-    <Button
-        android:id="@+id/SubmitButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:text="@string/submitAd"
-        android:textColor="@android:color/white"
-        android:layout_marginTop="27dp"
-        android:layout_below="@+id/AdLocation"
-        android:layout_centerHorizontal="true" />
 
     <ProgressBar
         android:id="@+id/progressBar"
