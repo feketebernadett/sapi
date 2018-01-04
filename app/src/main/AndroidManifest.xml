@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.MainActivity" />
-        <activity android:name=".Activities.AddAdvertisementActivity" />
+        <activity android:name=".Activities.AdvertisementActivity" />
         <activity android:name=".Activities.AdvertismentDetailActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"

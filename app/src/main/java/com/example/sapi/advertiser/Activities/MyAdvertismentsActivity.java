@@ -179,7 +179,7 @@ public class MyAdvertismentsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==R.id.action_add){
-            startActivity(new Intent(MyAdvertismentsActivity.this, AddAdvertisementActivity.class));
+            startActivity(new Intent(MyAdvertismentsActivity.this, AdvertisementActivity.class));
         }
         if(item.getItemId()==R.id.action_logout){
             logout();

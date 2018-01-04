@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -34,6 +37,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -44,25 +48,23 @@ import static com.example.sapi.advertiser.Utils.Const.EXTRA_AD_ID;
 import static com.example.sapi.advertiser.Utils.Const.EXTRA_AD_UID;
 import static com.example.sapi.advertiser.Utils.Const.USERS_CHILD;
 
-// TODO: rewrite this with fragments
-public class AdvertismentDetailActivity extends FragmentActivity implements OnMapReadyCallback {
+public class AdvertismentDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private String mAd_key = null;
     private String mUser_key = null;
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
 
-    //@BindView(R.id.ad_detail_image) private ImageView mAdDetailImage;
+    private GoogleMap mGoogleMap;
+
     @BindView(R.id.ad_detail_title)  TextView mAdDetailTitle;
     @BindView(R.id.ad_detail_description)  TextView mAdDetailDescription;
-
-    @BindView(R.id.ad_detail_remove)  Button mRemoveAdButton;
-    private GoogleMap mGoogleMap;
-    @BindView(R.id.imageSlider)
-    SliderLayout mSlider;
+    @BindView(R.id.imageSlider) SliderLayout mSlider;
     @BindView(R.id.ad_detail_user_image) ImageView mUserImage;
     @BindView(R.id.ad_detail_user_name) TextView mUserName;
     @BindView(R.id.call) Button mCall;
+    private Advertisment mAd;
+    private DatabaseReference mAdRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +74,6 @@ public class AdvertismentDetailActivity extends FragmentActivity implements OnMa
         ButterKnife.bind(this);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
         mAuth = FirebaseAuth.getInstance();
 
         mAd_key = getIntent().getExtras().getString(EXTRA_AD_ID);
@@ -80,26 +81,23 @@ public class AdvertismentDetailActivity extends FragmentActivity implements OnMa
 
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        DatabaseReference adRef = mDatabase.child(ADS_CHILD).child(mAd_key);
-        adRef.addValueEventListener(new ValueEventListener() {
+        mAdRef = mDatabase.child(ADS_CHILD).child(mAd_key);
+        mAdRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    Advertisment ad = dataSnapshot.getValue(Advertisment.class);
+                    mAd = dataSnapshot.getValue(Advertisment.class);
 
-                    mAdDetailTitle.setText(ad.title);
-                    mAdDetailDescription.setText(ad.description);
+                    mAdDetailTitle.setText(mAd.title);
+                    mAdDetailDescription.setText(mAd.description);
 
                     mGoogleMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(ad.locationLat, ad.locationLng))
-                            .title(ad.location)) ;
-                    mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(ad.locationLat, ad.locationLng),150));
+                            .position(new LatLng(mAd.locationLat, mAd.locationLng))
+                            .title(mAd.location)) ;
+                    mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mAd.locationLat, mAd.locationLng),150));
 
-                    initSlider(ad.adImages);
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    if (user != null && user.getUid().equals(ad.uid)) {
-                        mRemoveAdButton.setVisibility(View.VISIBLE);
-                    }
+                    initSlider(mAd.adImages);
+
                 }
                 else{
                     onBackPressed();
@@ -134,16 +132,7 @@ public class AdvertismentDetailActivity extends FragmentActivity implements OnMa
         });
 
 
-        mRemoveAdButton.setOnClickListener(new View.OnClickListener(){
 
-            @Override
-            public void onClick(View view) {
-               mDatabase.child(mAd_key).removeValue();
-                Intent listIntent = new Intent(AdvertismentDetailActivity.this, ListActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(listIntent);
-
-            }
-        });
 
         mCall.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,9 +146,9 @@ public class AdvertismentDetailActivity extends FragmentActivity implements OnMa
 
     }
 
-    private void initSlider(Map<String,String> images) {
+    private void initSlider(List<String> images) {
         mSlider.removeAllSliders();
-        for (String image : images.values()) {
+        for (String image : images) {
             TextSliderView textSliderView = new TextSliderView(this);
 
             textSliderView
@@ -182,6 +171,30 @@ public class AdvertismentDetailActivity extends FragmentActivity implements OnMa
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null && user.getUid().equals(mUser_key)) {
+            getMenuInflater().inflate(R.menu.advertisment_menu, menu);
+        }
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.action_delete){
+            mAdRef.removeValue();
+            Intent listIntent = new Intent(AdvertismentDetailActivity.this, ListActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(listIntent);
+        }
+        if(item.getItemId()==R.id.action_edit){
+            Intent editIntent = new Intent(AdvertismentDetailActivity.this, AdvertisementActivity.class);
+            editIntent.putExtra(EXTRA_AD_ID, mAd_key);
+            startActivity(editIntent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

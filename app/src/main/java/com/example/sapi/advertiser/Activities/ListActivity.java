@@ -2,18 +2,16 @@ package com.example.sapi.advertiser.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -40,50 +38,66 @@ import static com.example.sapi.advertiser.Utils.Const.USERS_CHILD;
 
 
 public class ListActivity extends AppCompatActivity {
+    private static final String SAVED_LAYOUT_MANAGER = "layout_manager";
     private DatabaseReference mDatabaseAds;
     private DatabaseReference mDatabaseUsers;
-    MyFirebaseRecyclerAdapter firebaseRecyclerAdapter;
+    static MyFirebaseRecyclerAdapter firebaseRecyclerAdapter;
     MyFirebaseRecyclerAdapter firebaseSearchRecyclerAdapter;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     @BindView(R.id.ad_list)
-    RecyclerView mAdList;
+    RecyclerView rvListAds;
     SearchView mSearchView;
+    private Menu mMenu;
+    private Parcelable layoutManagerSavedState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
+        ButterKnife.bind(this);
+
         mAuth=FirebaseAuth.getInstance();
+
         mAuthListener = new FirebaseAuth.AuthStateListener(){
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if(firebaseAuth.getCurrentUser()==null){
-                    Intent loginIntent = new Intent(ListActivity.this, LoginActivity.class);
-                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(loginIntent);
-                }
-                else{
-                    checkUserExists();
-                }
+                if(mMenu!=null)
+                    handleMenuOnAuthStateChange(firebaseAuth);
             }
         };
-        ButterKnife.bind(this);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setReverseLayout(true);
         layoutManager.setStackFromEnd(true);
 
-        mAdList.setHasFixedSize(true);
-        mAdList.setLayoutManager(layoutManager);
-
-
+        rvListAds.setHasFixedSize(true);
+        rvListAds.setLayoutManager(layoutManager);
 
         mDatabaseAds = FirebaseDatabase.getInstance().getReference().child(ADS_CHILD);
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child(USERS_CHILD);
         mDatabaseUsers.keepSynced(true);
         mDatabaseAds.keepSynced(true);
+    }
 
+    private void handleMenuOnAuthStateChange(FirebaseAuth firebaseAuth) {
+        if(firebaseAuth.getCurrentUser()==null){
+            mMenu.findItem(R.id.action_add).setVisible(false);
+            mMenu.findItem(R.id.action_settings).setVisible(false);
+            mMenu.findItem(R.id.action_logout).setVisible(false);
+
+            mMenu.findItem(R.id.action_login).setVisible(true);
+        }
+        else{
+            checkUserExists();
+
+            mMenu.findItem(R.id.action_add).setVisible(true);
+            mMenu.findItem(R.id.action_settings).setVisible(true);
+            mMenu.findItem(R.id.action_logout).setVisible(true);
+
+            mMenu.findItem(R.id.action_login).setVisible(false);
+        }
     }
 
     @Override
@@ -102,7 +116,7 @@ public class ListActivity extends AppCompatActivity {
                 R.layout.ad_row,
                 AdvertisementViewHolder.class,
                 mDatabaseAds);
-        mAdList.setAdapter(firebaseRecyclerAdapter);
+        rvListAds.setAdapter(firebaseRecyclerAdapter);
     }
 
     public static class AdvertisementViewHolder extends RecyclerView.ViewHolder{
@@ -146,6 +160,13 @@ public class ListActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        mMenu=menu;
+        createSearchBar(menu);
+        handleMenuOnAuthStateChange(mAuth);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void createSearchBar(Menu menu) {
         mSearchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -159,7 +180,7 @@ public class ListActivity extends AppCompatActivity {
 
 
                 if (mInput.equals("")){
-                    mAdList.setAdapter(firebaseRecyclerAdapter);
+                    rvListAds.setAdapter(firebaseRecyclerAdapter);
                     return false;
                 }
                 else {
@@ -171,18 +192,22 @@ public class ListActivity extends AppCompatActivity {
                                     .startAt(mInput)
                                     .endAt(mInput + "\uf8ff"));
 
-                    mAdList.setAdapter(firebaseSearchRecyclerAdapter);
+                    rvListAds.setAdapter(firebaseSearchRecyclerAdapter);
                 }
                 return false;
             }
         });
-        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.action_login){
+            Intent loginIntent = new Intent(ListActivity.this, LoginActivity.class);
+            loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(loginIntent);
+        }
         if(item.getItemId()==R.id.action_add){
-            startActivity(new Intent(ListActivity.this, AddAdvertisementActivity.class));
+            startActivity(new Intent(ListActivity.this, AdvertisementActivity.class));
         }
         if(item.getItemId()==R.id.action_logout){
             logout();
@@ -198,7 +223,6 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private void checkUserExists() {
-
         if(mAuth.getCurrentUser()!=null) {
             final String userId = mAuth.getCurrentUser().getUid();
 
@@ -222,7 +246,6 @@ public class ListActivity extends AppCompatActivity {
 
 
     public class MyFirebaseRecyclerAdapter  extends  FirebaseRecyclerAdapter<com.example.sapi.advertiser.Models.Advertisment, ListActivity.AdvertisementViewHolder>{
-
 
         public MyFirebaseRecyclerAdapter(Class<Advertisment> modelClass, int modelLayout, Class<ListActivity.AdvertisementViewHolder> viewHolderClass, Query ref) {
             super(modelClass, modelLayout, viewHolderClass, ref);
@@ -259,8 +282,6 @@ public class ListActivity extends AppCompatActivity {
             });
         }
     };
-
-
 
 
 }
